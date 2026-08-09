@@ -8,10 +8,7 @@
   ],
   "functions": {
     "api/index.js": {
-      "includeFiles": [
-        "candidates.json",
-        "curriculum.json"
-      ]
+      "includeFiles": "{candidates.json,curriculum.json}"
     }
   },
   "routes": [
