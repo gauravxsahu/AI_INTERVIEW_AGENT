@@ -6,7 +6,7 @@
 
 // Set VITE_API_URL in a .env file to point at your backend.
 // Falls back to localhost for local dev.
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL ;  //|| "http://localhost:3000"
 
 async function postJSON(path, body) {
   const res = await fetch(`${BASE_URL}${path}`, {
