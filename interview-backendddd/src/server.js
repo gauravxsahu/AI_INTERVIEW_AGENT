@@ -66,16 +66,17 @@ app.post("/interview/answer", async (req, res) => {
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
-const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT ;
 
 // Pehle MongoDB se connect karo, uske baad hi server start karo
 connectDB()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Interview backend running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to connect to MongoDB:", err.message);
-    process.exit(1);
-  });
+  // .then(() => {
+  //   app.listen(PORT, () => {
+  //     console.log(`Interview backend running on http://localhost:${PORT}`);
+  //   });
+  // })
+  // .catch((err) => {
+  //   console.error("Failed to connect to MongoDB:", err.message);
+  //   process.exit(1);
+  // });
+  export default app;
