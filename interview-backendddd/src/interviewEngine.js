@@ -11,7 +11,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
 
-const TOTAL_QUESTIONS = 2;
+const TOTAL_QUESTIONS = 10;
 
 // =============================================================
 // 1. LOAD DATA (once, at startup)
