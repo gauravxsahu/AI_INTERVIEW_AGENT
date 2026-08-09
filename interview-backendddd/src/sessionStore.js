@@ -1,26 +1,53 @@
 import { randomUUID } from "crypto";
-
-// In-memory store: { sessionId -> session object from interviewEngine.js }
-// Good enough for a demo/hackathon. For production, swap this for Redis
-// or a database keyed by sessionId, since this resets on server restart.
-const sessions = new Map();
+import InterviewSession from "./models/Interviewsession.js";
 
 export function createSessionId() {
   return randomUUID();
 }
 
-export function saveSession(sessionId, session) {
-  sessions.set(sessionId, session);
+// session object (from interviewEngine.js) has a `vectorStore` field —
+// that's a runtime-only object (embeddings client, functions) and can't
+// be stored in MongoDB. Strip it out before saving.
+function stripVectorStore(session) {
+  const { vectorStore, ...rest } = session;
+  return rest;
 }
 
-export function getSession(sessionId) {
-  const session = sessions.get(sessionId);
-  if (!session) {
-    throw new Error(`No interview session found for sessionId "${sessionId}". It may have expired or the server restarted.`);
+export async function saveSession(sessionId, session) {
+  const data = stripVectorStore(session);
+
+  await InterviewSession.findOneAndUpdate(
+    { sessionId },
+    {
+      sessionId,
+      candidateName: data.candidateName,
+      systemPrompt: data.systemPrompt,
+      conversation: data.conversation,
+      questionNumber: data.questionNumber,
+    },
+   { upsert: true, returnDocument: "after" }
+  );
+}
+
+export async function getSession(sessionId) {
+  const doc = await InterviewSession.findOne({ sessionId }).lean();
+
+  if (!doc) {
+    throw new Error(
+      `No interview session found for sessionId "${sessionId}". It may have expired or the server restarted.`
+    );
   }
-  return session;
+
+  // vectorStore yaha nahi hai — caller (server.js) ko ye re-attach karna
+  // hoga using initVectorStore() before passing to submitAnswer().
+  return {
+    candidateName: doc.candidateName,
+    systemPrompt: doc.systemPrompt,
+    conversation: doc.conversation,
+    questionNumber: doc.questionNumber,
+  };
 }
 
-export function deleteSession(sessionId) {
-  sessions.delete(sessionId);
+export async function deleteSession(sessionId) {
+  await InterviewSession.deleteOne({ sessionId });
 }

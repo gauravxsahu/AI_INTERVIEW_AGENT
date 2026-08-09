@@ -9,7 +9,7 @@ import { z } from "zod";
 import dotenv from "dotenv";
 dotenv.config();
 
-const TOTAL_QUESTIONS = 4;
+const TOTAL_QUESTIONS = 2;
 
 // =============================================================
 // 1. LOAD DATA (once, at startup)

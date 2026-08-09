@@ -2,15 +2,22 @@ export default function QuestionCard({ question }) {
   if (!question) return null;
 
   return (
-    <div className="animate-fadeUp rounded-2xl border border-border-light bg-card-light p-7 shadow-sm dark:border-border-dark dark:bg-card-dark">
+    <div className="animate-fadeUp flex min-h-110 flex-col rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
+      {/* Topic */}
       {question.title && (
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-500/10 dark:text-primary-400">
-          {question.title}
+        <div className="mb-5">
+          <span className="inline-flex items-center rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700">
+            {question.title}
+          </span>
         </div>
       )}
-      <p className="text-lg font-medium leading-relaxed text-ink-light dark:text-ink-dark">
-        {question.text}
-      </p>
+
+      {/* Question */}
+      <div className="flex flex-1 items-start">
+        <p className="text-lg font-medium leading-8 text-slate-800">
+          {question.text}
+        </p>
+      </div>
     </div>
   );
 }

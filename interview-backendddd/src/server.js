@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { startInterview, submitAnswer } from "./interviewEngine.js";
+import { startInterview, submitAnswer, initVectorStore } from "./interviewEngine.js";
+import { connectDB } from "./db.js";
 import { createSessionId, saveSession, getSession, deleteSession } from "./sessionStore.js";
 
 const app = express();
@@ -21,7 +22,7 @@ app.post("/interview/start", async (req, res) => {
 
     const result = await startInterview(candidateId);
     const sessionId = createSessionId();
-    saveSession(sessionId, result.session);
+    await saveSession(sessionId, result.session);
 
     res.json({
       sessionId,
@@ -46,12 +47,15 @@ app.post("/interview/answer", async (req, res) => {
       return res.status(400).json({ error: "sessionId and answer are required" });
     }
 
-    const session = getSession(sessionId);
-    const result = await submitAnswer(session, answer);
+    const session = await getSession(sessionId);
 
-    if (result.done) {
-      deleteSession(sessionId); // interview is over, free the memory
-    }
+    // vectorStore MongoDB me save nahi hota (isme embeddings/functions
+    // hote hai) — isliye shared in-memory vector store yaha wapas attach
+    // kar rahe hai before using the session.
+    session.vectorStore = await initVectorStore();
+
+    const result = await submitAnswer(session, answer);
+    await saveSession(sessionId, session);
 
     res.json(result);
   } catch (err) {
@@ -63,6 +67,15 @@ app.post("/interview/answer", async (req, res) => {
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Interview backend running on http://localhost:${PORT}`);
-});
+
+// Pehle MongoDB se connect karo, uske baad hi server start karo
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Interview backend running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err.message);
+    process.exit(1);
+  });
