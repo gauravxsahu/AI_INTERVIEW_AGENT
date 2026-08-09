@@ -1,6 +1,6 @@
 import fs from "fs";
 // import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { ChatOpenAI,OpenAIEmbeddings} from "@langchain/openai";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";;
 import { Document } from "@langchain/core/documents";
 import { tool } from "@langchain/core/tools";
