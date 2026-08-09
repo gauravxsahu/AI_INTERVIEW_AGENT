@@ -1,12 +1,14 @@
 import fs from "fs";
 // import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { ChatOpenAI,OpenAIEmbeddings} from "@langchain/openai";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";;
 import { Document } from "@langchain/core/documents";
 import { tool } from "@langchain/core/tools";
 import { createAgent } from "langchain";
 import { z } from "zod";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 dotenv.config();
 
 const TOTAL_QUESTIONS = 2;
@@ -14,8 +16,17 @@ const TOTAL_QUESTIONS = 2;
 // =============================================================
 // 1. LOAD DATA (once, at startup)
 // =============================================================
-const candidates = JSON.parse(fs.readFileSync("./candidates.json", "utf-8"));
-const curriculum = JSON.parse(fs.readFileSync("./curriculum.json", "utf-8"));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const candidates = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "../candidates.json"), "utf-8")
+);
+
+const curriculum = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "../curriculum.json"), "utf-8")
+);
 
 // =============================================================
 // 2. BUILD THE RAG INDEX (once, at startup — shared by every session)
